@@ -1,12 +1,8 @@
 package main
 
 import (
-	"context"
-
-	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/valcosmos/go-example/rest-api/database"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func main() {
@@ -19,27 +15,29 @@ func main() {
 	// defer close database
 	defer database.CloseMongoDB()
 
-	app := fiber.New()
+	app := generateApp()
 
-	app.Post("/", func(c *fiber.Ctx) error {
-		sampleDoc := bson.M{"name": "Sample todo"}
+	// app := fiber.New()
 
-		collection := database.GetCollection("todos")
+	// app.Post("/", func(c *fiber.Ctx) error {
+	// 	sampleDoc := bson.M{"name": "Sample todo"}
 
-		nDoc, err := collection.InsertOne(context.TODO(), sampleDoc)
+	// 	collection := database.GetCollection("todos")
 
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString("Error inserting todo")
-		}
+	// 	nDoc, err := collection.InsertOne(context.TODO(), sampleDoc)
 
-		return c.JSON(nDoc)
+	// 	if err != nil {
+	// 		return c.Status(fiber.StatusInternalServerError).SendString("Error inserting todo")
+	// 	}
 
-		// c.SendString("hello World")
-	})
+	// 	return c.JSON(nDoc)
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	// c.SendString("hello World")
+	// })
+
+	// app.Get("/", func(c *fiber.Ctx) error {
+	// 	return c.SendString("Hello, World!")
+	// })
 
 	app.Listen(":3000")
 }
