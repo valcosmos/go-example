@@ -1,9 +1,28 @@
 package main
 
 import (
+	"os"
+
+	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/valcosmos/go-example/rest-api/database"
+	"github.com/valcosmos/go-example/rest-api/handlers"
 )
+
+func generateApp() *fiber.App {
+	app := fiber.New()
+
+	// create health check route
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.SendString("ok")
+	})
+	// create the library group and routes
+	libGroup := app.Group("/library")
+
+	libGroup.Get("/", handlers.TestHandler)
+
+	return app
+}
 
 func main() {
 	// init app
@@ -17,29 +36,9 @@ func main() {
 
 	app := generateApp()
 
-	// app := fiber.New()
+	port := os.Getenv("PORT")
 
-	// app.Post("/", func(c *fiber.Ctx) error {
-	// 	sampleDoc := bson.M{"name": "Sample todo"}
-
-	// 	collection := database.GetCollection("todos")
-
-	// 	nDoc, err := collection.InsertOne(context.TODO(), sampleDoc)
-
-	// 	if err != nil {
-	// 		return c.Status(fiber.StatusInternalServerError).SendString("Error inserting todo")
-	// 	}
-
-	// 	return c.JSON(nDoc)
-
-	// c.SendString("hello World")
-	// })
-
-	// app.Get("/", func(c *fiber.Ctx) error {
-	// 	return c.SendString("Hello, World!")
-	// })
-
-	app.Listen(":3000")
+	app.Listen(":" + port)
 }
 
 func initApp() error {
@@ -55,9 +54,12 @@ func initApp() error {
 }
 
 func loadENV() error {
-	err := godotenv.Load()
-	if err != nil {
-		return err
+	goEnv := os.Getenv("GO_ENV")
+	if goEnv == "" {
+		err := godotenv.Load()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
